@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SO Harian KDKMP</title>
+<meta name="description" content="Aplikasi stock opname harian Koperasi Desa Merah Putih oleh NARA TECH.">
+<meta name="theme-color" content="#B81D2A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SO Harian">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root{--red:#B81D2A;--ink:#1C1718;--mute:#5F5759;--bg:#FFFFFF}
+  html,body{margin:0;height:100%;background:var(--bg);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink)}
+  /* Aplikasi Apps Script mengisi seluruh layar */
+  #app{position:fixed;inset:0;width:100%;height:100%;border:0;display:block;background:var(--bg)}
+  /* Layar pembuka & layar tanpa sinyal */
+  .layar{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:var(--bg);transition:opacity .3s}
+  .layar img{width:120px;height:120px}
+  .layar p{margin:0;max-width:30ch;line-height:1.5;color:var(--mute)}
+  .layar b{font-size:18px;color:var(--ink)}
+  .layar button{min-height:48px;padding:0 22px;border:0;border-radius:14px;background:var(--red);color:#fff;font:inherit;font-weight:700}
+  .hilang{opacity:0;pointer-events:none}
+  .sembunyi{display:none}
+  @media (prefers-reduced-motion:reduce){.layar{transition:none}}
+</style>
+</head>
+<body>
+  <!-- Ganti URL di bawah bila deployment Apps Script berubah -->
+  <iframe id="app" title="SO Harian KDKMP" allow="clipboard-write"
+    src="https://script.google.com/macros/s/AKfycbwIc72phz2eVzpSVeSf8H_pya_htIOW2qLZq1gxbpoSRzOe3Ci7rpET3HotKWAUD8tgJw/exec"></iframe>
+
+  <div class="layar" id="pembuka" aria-live="polite">
+    <img src="ikon-192.png" width="120" height="120" alt="Kopdes Merah Putih">
+    <p>Membuka aplikasi…</p>
+  </div>
+
+  <div class="layar sembunyi" id="offline" role="alert">
+    <img src="ikon-192.png" width="120" height="120" alt="">
+    <b>Tidak ada sinyal internet</b>
+    <p>Aplikasi butuh internet untuk membaca dan menyimpan data. Nyalakan data seluler atau Wi-Fi, lalu coba lagi.</p>
+    <button type="button" id="cobaLagi">Coba lagi</button>
+  </div>
+
+<script>
+  var app = document.getElementById('app'), pembuka = document.getElementById('pembuka'), offline = document.getElementById('offline');
+  function tutupPembuka(){ pembuka.classList.add('hilang'); }
+  app.addEventListener('load', function(){ setTimeout(tutupPembuka, 300); });
+  setTimeout(tutupPembuka, 8000); // jaga-jaga kalau event load tidak terpanggil
+  function cekSinyal(){
+    var putus = !navigator.onLine;
+    offline.classList.toggle('sembunyi', !putus);
+  }
+  window.addEventListener('offline', cekSinyal);
+  window.addEventListener('online', function(){ cekSinyal(); app.src = app.src; });
+  document.getElementById('cobaLagi').onclick = function(){ if (navigator.onLine) { offline.classList.add('sembunyi'); app.src = app.src; } else cekSinyal(); };
+  cekSinyal();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+</body>
+</html>
